@@ -1,3 +1,16 @@
+#############################################################################
+#
+#
+# usage:
+#     python Fragment_length_density_plot <bam_files> <labels> <out_prefix>
+# output:
+#     out_prefix_histogram.png
+#     and
+#     out_prefix_log_scale.png
+#
+#
+#############################################################################
+
 import sys
 import matplotlib
 matplotlib.use("Agg")
