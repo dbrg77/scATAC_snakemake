@@ -1,15 +1,25 @@
-#############################################################################
-#
+###################################################################################
+# Xi Chen (dbrg77 at gmail dot com)
 #
 # usage:
-#     python Fragment_length_density_plot <bam_files> <labels> <out_prefix>
+#     python Fragment_length_density_plot.py <bam_files> <labels> <out_prefix>
+# 
 # output:
 #     out_prefix_histogram.png
 #     and
 #     out_prefix_log_scale.png
 #
+# example:
+#     python Fragment_length_density_plot.py ESC.bam NPC.bam ESC NPC density_plot
+# 
+# it will generate two files:
+# density_plot_histogram.png and density_plot_log_scale.png
+# 
+# The fragment length info. from the two bam input files
+#   will be plotted in the same figure.
 #
-#############################################################################
+#
+##################################################################################
 
 import sys
 import matplotlib
