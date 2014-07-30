@@ -7,12 +7,12 @@ Fragment_length_density_plot.py
 -------------------------------
 
 Requirements:
--------------
+~~~~~~~~~~~~~~
 
 matplotlib
 numpy
 pysam
-
+~~~~~~~~~~~~~
 
 Usage:
 
