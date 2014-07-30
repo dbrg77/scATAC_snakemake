@@ -8,22 +8,21 @@ Fragment_length_density_plot.py
 
 Requirements:
 
-`````````````
 matplotlib
 numpy
 pysam
-`````````````
 
 
 Usage:
-~~~~~~
 
 python Fragment_length_density_plot.py <input_bam_files> <sample_labels> <output_file_prefix>
 
-The script takes multiple paired-end bam files as input, extract the isize information from properly paired reads, and plot the density of the isize. It can plot a maximum of 7 samples in one figure.
+The script takes multiple paired-end bam files as input, extract the isize information from 
+properly paired reads, and plot the density of the isize. It can plot a maximum of 7 samples
+in one figure.
 
 Example:
-````````
+
 
 Plot one sample:
 
