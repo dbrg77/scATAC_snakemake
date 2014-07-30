@@ -7,15 +7,16 @@ Fragment_length_density_plot.py
 -------------------------------
 
 Requirements:
-`````````````
 
+`````````````
 matplotlib
 numpy
 pysam
+`````````````
 
 
 Usage:
-``````
+~~~~~~
 
 python Fragment_length_density_plot.py <input_bam_files> <sample_labels> <output_file_prefix>
 
