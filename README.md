@@ -25,13 +25,13 @@ Example:
 ~~~~~~~~~~~~~~~~
 Plot one sample:
 
-:python Fragment_length_density_plot.py input1.bam sample1 density
+python Fragment_length_density_plot.py input1.bam sample1 density
 
 The command generates two figures: density_hitogram.png (regular scale) and density_log_scale.png (log scale)
 
 Plot three samples:
 
-:python Fragment_length_density_plot.py input1.bam input2.bam input3.bam sample1 sample2 sample3 out
+python Fragment_length_density_plot.py input1.bam input2.bam input3.bam sample1 sample2 sample3 out
 
 The command generates two figures: out_hitogram.png and out_log_scale.png. Each figures contains three samples (1 - 3).
 ~~~~~~~~~~~~~~~~
