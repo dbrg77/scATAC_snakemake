@@ -1,5 +1,5 @@
 ###################################################################################
-# Xi Chen (dbrg77 at gmail dot com)
+# Xi Chen (xi.chen.xchen at gmail dot com)
 #
 # usage:
 #     python Fragment_length_density_plot.py <bam_files> <labels> <out_prefix>
