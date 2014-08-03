@@ -44,7 +44,7 @@ for i,j in enumerate(files):
     frags.append([])
     bam = pysam.Samfile(j, 'rb')
     for read in bam:
-        if bam.getrname(read.tid)!="chrM" and read.tlen>0 and read.tlen<1200:
+        if bam.getrname(read.tid)!="chrM" and read.tlen>50 and read.tlen<1500:
             frags[i].append(read.tlen)
     bam.close()
     hist, b = np.histogram(frags[i], bins, density=True)
@@ -55,8 +55,8 @@ for i,j in enumerate(data):
     xs, ys = j
     plt.plot(xs, ys, colour[i]+'-', label=labels[i], alpha=0.7)
 
-plt.xticks(range(0,1200,200))
-plt.xlim(0,1200)
+plt.xticks(range(0,1600,200))
+plt.xlim(0,1600)
 plt.xlabel('Fragment length (bp)')
 plt.ylabel('Density')
 plt.legend()
@@ -71,8 +71,8 @@ for i,j in enumerate(data):
         ymax = max(ys)
     plt.plot(xs, ys, colour[i]+'-', label=labels[i], alpha=0.7)
 
-plt.xticks(range(0,1200,200))
-plt.xlim(0,1200)
+plt.xticks(range(0,1600,200))
+plt.xlim(0,1600)
 plt.yscale('log')
 plt.ylim(ymax/10000., ymax+0.05)
 plt.xlabel('Fragment length (bp)')
