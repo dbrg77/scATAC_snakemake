@@ -27,7 +27,7 @@ Plot one sample:
 
 python Fragment_length_density_plot.py input1.bam sample1 density
 
-The command generates two figures: density_hitogram.png (regular scale) and density_log_scale.png (log scale)
+The command generates two figures: density_hitogram.pdf (regular scale) and density_log_scale.pdf (log scale)
 
 Plot three samples:
 
