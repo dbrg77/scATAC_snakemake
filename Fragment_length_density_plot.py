@@ -5,9 +5,9 @@
 #     python Fragment_length_density_plot.py <bam_files> <labels> <out_prefix>
 # 
 # output:
-#     out_prefix_histogram.png
+#     out_prefix_histogram.pdf
 #     and
-#     out_prefix_log_scale.png
+#     out_prefix_log_scale.pdf
 #
 # example:
 #     python Fragment_length_density_plot.py ESC.bam NPC.bam ESC NPC density_plot
@@ -60,7 +60,7 @@ plt.xlim(0,1600)
 plt.xlabel('Fragment length (bp)')
 plt.ylabel('Density')
 plt.legend()
-plt.savefig(prefix+"_histogram.png")
+plt.savefig(prefix+"_histogram.pdf")
 
 plt.clf()
 ymax = 0
@@ -78,4 +78,4 @@ plt.ylim(ymax/10000., ymax+0.05)
 plt.xlabel('Fragment length (bp)')
 plt.ylabel('Density')
 plt.legend()
-plt.savefig(prefix+"_log_scale.png")
+plt.savefig(prefix+"_log_scale.pdf")
