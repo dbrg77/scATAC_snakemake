@@ -6,7 +6,7 @@
 # 
 # output:
 #     out_prefix_histogram.pdf
-#     and
+#   and
 #     out_prefix_log_scale.pdf
 #
 # example:
