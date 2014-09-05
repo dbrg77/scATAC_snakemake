@@ -35,8 +35,8 @@ labels = sys.argv[d:-1]
 prefix = sys.argv[-1]
 colour = ['r', 'g', 'b', 'c', 'm', 'y', 'k']
 
-bins = np.linspace(0, 1200, 1201)
-data = np.empty((len(files), 2, 1200))
+bins = np.linspace(0, 1500, 1501)
+data = np.empty((len(files), 2, 1500))
 
 frags = []
 
@@ -44,7 +44,7 @@ for i,j in enumerate(files):
     frags.append([])
     bam = pysam.Samfile(j, 'rb')
     for read in bam:
-        if bam.getrname(read.tid)!="chrM" and read.tlen>50 and read.tlen<1500:
+        if bam.getrname(read.tid)!="chrM" and read.tlen>75 and read.tlen<1500:
             frags[i].append(read.tlen)
     bam.close()
     hist, b = np.histogram(frags[i], bins, density=True)
