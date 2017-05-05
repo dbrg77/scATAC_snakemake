@@ -31,7 +31,7 @@ plt.xlabel("Length (bp)", fontsize=18)
 plt.yticks(fontsize=16)
 plt.ylabel("Density", fontsize=18)
 plt.tight_layout()
-plt.savefig('test.pdf', transparent=True)
+plt.savefig(pdf, transparent=True)
 
 # output x,y values for more flexible plot and qc by other programs
 with open(txt, 'w') as fh:

@@ -1,37 +1,20 @@
-ATAC
-====
+# ATAC
 
 Scripts in this repos are used to perform ATAC-seq analyses routines.
+```sh
+frag_distr.py
+```
 
-Fragment_length_density_plot.py
--------------------------------
+# Requirements
+  - matplotlib
+  - pysam
 
-Requirements:
-~~~~~~~~~~~~~~
-matplotlib
-numpy
-pysam
-~~~~~~~~~~~~~
+# Usage
+```sh
+python frag_distr.py input_alignment.bam out_prfix
+```
 
-Usage:
-~~~~~~
-python Fragment_length_density_plot.py <input_bam_files> <sample_labels> <output_file_prefix>
-~~~~~~
-The script takes multiple paired-end bam files as input, extract the isize information from 
-properly paired reads, and plot the density of the isize. It can plot a maximum of 7 samples
-in one figure.
+# Output:
 
-Example:
-~~~~~~~~~~~~~~~~
-Plot one sample:
-
-python Fragment_length_density_plot.py input1.bam sample1 density
-
-The command generates two figures: density_hitogram.pdf (regular scale) and density_log_scale.pdf (log scale)
-
-Plot three samples:
-
-python Fragment_length_density_plot.py input1.bam input2.bam input3.bam sample1 sample2 sample3 out
-
-The command generates two figures: out_hitogram.png and out_log_scale.png. Each figures contains three samples (1 - 3).
-~~~~~~~~~~~~~~~~
+* out_prefix_isize_hist.pdf: density plot of insert size.
+* out_prefix_isize_density_xy_values.txt: a two-column tab-delimited file with length:density pair.
