@@ -1,81 +1,40 @@
-###################################################################################
-# Xi Chen (xi.chen.xchen at gmail dot com)
-#
-# usage:
-#     python Fragment_length_density_plot.py <bam_files> <labels> <out_prefix>
-# 
-# output:
-#     out_prefix_histogram.pdf
-#   and
-#     out_prefix_log_scale.pdf
-#
-# example:
-#     python Fragment_length_density_plot.py ESC.bam NPC.bam ESC NPC density_plot
-# 
-# it will generate two files:
-# density_plot_histogram.png and density_plot_log_scale.png
-# 
-# The fragment length info. from the two bam input files
-#   will be plotted in the same figure.
-#
-#
-##################################################################################
-
-import sys
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import numpy as np
+import array
 import pysam
+import sys
 
-d = len(sys.argv)/2
+bam = pysam.AlignmentFile(sys.argv[1], "rb")
+pdf = ''.join([sys.argv[2], "_isize_hist.pdf"])
+txt = ''.join([sys.argv[2], "isize_density_xy_values.txt"])
 
-files = sys.argv[1:d]
-labels = sys.argv[d:-1]
-prefix = sys.argv[-1]
-colour = ['r', 'g', 'b', 'c', 'm', 'y', 'k']
+frags = array.array('i', [])
 
-bins = np.linspace(0, 1500, 1501)
-data = np.empty((len(files), 2, 1500))
+for read in bam:
+    
+    if (not read.is_unmapped and \
+        read.reference_name != "chrM" and \
+        read.is_proper_pair and \
+        read.is_read1 > 0):
+        
+        frags.append(abs(read.template_length))
 
-frags = []
+bam.close()
 
-for i,j in enumerate(files):
-    frags.append([])
-    bam = pysam.Samfile(j, 'rb')
-    for read in bam:
-        if bam.getrname(read.tid)!="chrM" and read.tlen>75 and read.tlen<1500:
-            frags[i].append(read.tlen)
-    bam.close()
-    hist, b = np.histogram(frags[i], bins, density=True)
-    data[i][0] = (b[1:]+b[:-1])/2
-    data[i][1] = hist
+# plot histogram
+plt.subplots(figsize=(8,8))
+y, x, p = plt.hist(frags, bins=range(0,2001), range=(0,2000),
+                   normed=1, color='r', histtype="step", alpha=.8)
+plt.xticks(range(0,2500,500), map(str, range(0,2500,500)), fontsize=16)
+plt.xlabel("Length (bp)", fontsize=18)
+plt.yticks(fontsize=16)
+plt.ylabel("Density", fontsize=18)
+plt.tight_layout()
+plt.savefig('test.pdf', transparent=True)
 
-for i,j in enumerate(data):
-    xs, ys = j
-    plt.plot(xs, ys, colour[i]+'-', label=labels[i], alpha=0.7)
-
-plt.xticks(range(0,1600,200))
-plt.xlim(0,1600)
-plt.xlabel('Fragment length (bp)')
-plt.ylabel('Density')
-plt.legend()
-plt.savefig(prefix+"_histogram.pdf")
-
-plt.clf()
-ymax = 0
-
-for i,j in enumerate(data):
-    xs, ys = j
-    if max(ys) > ymax:
-        ymax = max(ys)
-    plt.plot(xs, ys, colour[i]+'-', label=labels[i], alpha=0.7)
-
-plt.xticks(range(0,1600,200))
-plt.xlim(0,1600)
-plt.yscale('log')
-plt.ylim(ymax/10000., ymax+0.05)
-plt.xlabel('Fragment length (bp)')
-plt.ylabel('Density')
-plt.legend()
-plt.savefig(prefix+"_log_scale.pdf")
+# output x,y values for more flexible plot and qc by other programs
+with open(txt, 'w') as fh:
+    fh.write("length\tdensity\n")
+    for i,j in enumerate(y):
+        fh.write("%s\t%s\n" % (x[i], j))
