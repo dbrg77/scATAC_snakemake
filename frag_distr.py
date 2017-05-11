@@ -7,7 +7,7 @@ import sys
 
 bam = pysam.AlignmentFile(sys.argv[1], "rb")
 pdf = ''.join([sys.argv[2], "_isize_hist.pdf"])
-txt = ''.join([sys.argv[2], "isize_density_xy_values.txt"])
+txt = ''.join([sys.argv[2], "_isize_density_xy_values.txt"])
 
 frags = array.array('i', [])
 
