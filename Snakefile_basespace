@@ -1,0 +1,99 @@
+from glob import iglob
+
+samples = iglob("fastq/*_L001_R1_001.fastq.gz")
+sn = [i.split('/')[1][:-21] for i in samples]
+
+rule all:
+    input:
+        [''.join(['fastq/', i, '_L001_R1_001.fastq.gz']) for i in sn],
+        [''.join(['fastq/', i, '_L001_R2_001.fastq.gz']) for i in sn],
+        [''.join(['fastq/', i, '_L002_R1_001.fastq.gz']) for i in sn],
+        [''.join(['fastq/', i, '_L002_R2_001.fastq.gz']) for i in sn],
+        [''.join(['trim_fq/', i, '_L001_R1_trimmed.fq.gz']) for i in sn],
+        [''.join(['trim_fq/', i, '_L001_R2_trimmed.fq.gz']) for i in sn],
+        [''.join(['trim_fq/', i, '_L002_R1_trimmed.fq.gz']) for i in sn],
+        [''.join(['trim_fq/', i, '_L002_R2_trimmed.fq.gz']) for i in sn],
+        [''.join(['bowtie2_mm10_mapped/', i, '.sam']) for i in sn],
+        [''.join(['f2q30_bam/', i, '_f2q30.bam']) for i in sn],
+        [''.join(['picard_bam/', i, '_f2q30_pmd.bam']) for i in sn],
+        [''.join(['picard_log/', i, '_f2q30_pmd.out']) for i in sn]
+
+rule cutadapt:
+    input:
+        l1r1='fastq/{sample_name}_L001_R1_001.fastq.gz',
+        l1r2='fastq/{sample_name}_L001_R2_001.fastq.gz',
+        l2r1='fastq/{sample_name}_L002_R1_001.fastq.gz',
+        l2r2='fastq/{sample_name}_L002_R2_001.fastq.gz'
+    output:
+        l1r1='trim_fq/{sample_name}_L001_R1_trimmed.fq.gz',
+        l1r2='trim_fq/{sample_name}_L001_R2_trimmed.fq.gz',
+        l2r1='trim_fq/{sample_name}_L002_R1_trimmed.fq.gz',
+        l2r2='trim_fq/{sample_name}_L002_R2_trimmed.fq.gz'
+    shell:
+        ''' cutadapt \
+            -f fastq \
+            -m 25 \
+            -u -1 \
+            -U -1 \
+            -a CTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG \
+            -A CTGTCTCTTATACACATCTGACGCTGCCGACGANNNNNNNNGTGTAGATCTCGGTGGTCGCCGTATCATT \
+            -o {output.l1r1} -p {output.l1r2} \
+            {input.l1r1} {input.l1r2}
+            cutadapt \
+            -f fastq \
+            -m 25 \
+            -u -1 \
+            -U -1 \
+            -a CTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG \
+            -A CTGTCTCTTATACACATCTGACGCTGCCGACGANNNNNNNNGTGTAGATCTCGGTGGTCGCCGTATCATT \
+            -o {output.l2r1} -p {output.l2r2} \
+            {input.l2r1} {input.l2r2}
+        '''
+
+rule bwt2:
+    input:
+        l1r1='trim_fq/{sample_name}_L001_R1_trimmed.fq.gz',
+        l1r2='trim_fq/{sample_name}_L001_R2_trimmed.fq.gz',
+        l2r1='trim_fq/{sample_name}_L002_R1_trimmed.fq.gz',
+        l2r2='trim_fq/{sample_name}_L002_R2_trimmed.fq.gz'
+    output:
+        'bowtie2_mm10_mapped/{sample_name}.sam'
+    shell:
+        ''' bowtie2 \
+            -X 2000 \
+            -p 4 \
+            -x /hps/nobackup/teichmann/xi/iGenome/Mus_musculus/UCSC/mm10/Sequence/Bowtie2Index/genome \
+            -1 {input.l1r1},{input.l2r1} \
+            -2 {input.l1r2},{input.l2r2} \
+            -S {output}
+        '''
+
+rule sam2bam:
+    input:
+        'bowtie2_mm10_mapped/{sample_name}.sam'
+    output:
+        'f2q30_bam/{sample_name}_f2q30.bam'
+    shell:
+        ''' samtools view \
+            -ShuF 4 -f 2 -q 30 {input} | \
+            samtools sort \
+            - -T f2q30_bam/{wildcards.sample_name}_tmp \
+            -o {output}
+        '''
+
+rule picard:
+    input:
+        'f2q30_bam/{sample_name}_f2q30.bam'
+    output:
+       bam='picard_bam/{sample_name}_f2q30_pmd.bam',
+       met='picard_log/{sample_name}_f2q30_pmd.out'
+    shell:
+        ''' java -jar -Xmx10g \
+            /nfs/leia/research/saraht/xi/tools/pbin/picard.jar \
+            MarkDuplicates \
+            INPUT={input} \
+            OUTPUT={output.bam} \
+            REMOVE_DUPLICATES=true \
+            ASSUME_SORTED=true \
+            METRICS_FILE={output.met}
+        '''

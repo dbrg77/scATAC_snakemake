@@ -1,0 +1,71 @@
+rule all:
+    input:
+        [''.join(['trim_fq/', i, '_1.fastq']) for i in ["SRR5799473", "SRR5799474"]],
+        [''.join(['trim_fq/', i, '_2.fastq']) for i in ["SRR5799473", "SRR5799474"]],
+        [''.join(['bowtie2_mm10_mapped/', i, '.sam']) for i in ["SRR5799473", "SRR5799474"]],
+        [''.join(['f2q30_bam/', i, '_f2q30.bam']) for i in ["SRR5799473", "SRR5799474"]],
+        [''.join(['picard_bam/', i, '_f2q30_pmd.bam']) for i in ["SRR5799473", "SRR5799474"]],
+        [''.join(['picard_log/', i, '_f2q30_pmd.out']) for i in ["SRR5799473", "SRR5799474"]]
+
+rule cutadapt:
+    output:
+        r1='trim_fq/{run_accession}_1.fastq',
+        r2='trim_fq/{run_accession}_2.fastq'
+    shell:
+        ''' cutadapt \
+            -f fastq \
+            -m 25 \
+            -u -1 \
+            -a CTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG \
+            -A CTGTCTCTTATACACATCTGACGCTGCCGACGANNNNNNNNGTGTAGATCTCGGTGGTCGCCGTATCATT \
+            -o {output.r1} \
+            -p {output.r2} \
+            <(stream_ena {wildcards.run_accession}_1.fastq) \
+            <(stream_ena {wildcards.run_accession}_2.fastq)
+        '''
+
+rule bwt2:
+    input:
+        r1='trim_fq/{run_accession}_1.fastq',
+        r2='trim_fq/{run_accession}_2.fastq'
+    output:
+        'bowtie2_mm10_mapped/{run_accession}.sam'
+    shell:
+        ''' bowtie2 \
+            -X 2000 \
+            -p 4 \
+            -x /hps/nobackup/teichmann/xi/iGenome/Mus_musculus/UCSC/mm10/Sequence/Bowtie2Index/genome \
+            -1 {input.r1} \
+            -2 {input.r2} \
+            -S {output}
+        '''
+
+rule sam2bam:
+    input:
+        'bowtie2_mm10_mapped/{run_accession}.sam'
+    output:
+        'f2q30_bam/{run_accession}_f2q30.bam'
+    shell:
+        ''' samtools view \
+            -ShuF 4 -f 2 -q 30 {input} | \
+            samtools sort \
+            - -T f2q30_bam/{wildcards.run_accession}_tmp \
+            -o {output}
+        '''
+
+rule picard:
+    input:
+        'f2q30_bam/{run_accession}_f2q30.bam'
+    output:
+       bam='picard_bam/{run_accession}_f2q30_pmd.bam',
+       met='picard_log/{run_accession}_f2q30_pmd.out'
+    shell:
+        ''' java -jar -Xmx10g \
+            /nfs/leia/research/saraht/xi/tools/pbin/picard.jar \
+            MarkDuplicates \
+            INPUT={input} \
+            OUTPUT={output.bam} \
+            REMOVE_DUPLICATES=true \
+            ASSUME_SORTED=true \
+            METRICS_FILE={output.met}
+        '''
