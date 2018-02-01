@@ -1,3 +1,6 @@
+# for processing samples from Hiseq2500 rapid run
+# one sample is splitted into two lanes
+
 from glob import iglob
 
 samples = iglob("fastq/*_L001_R1_001.fastq.gz")
