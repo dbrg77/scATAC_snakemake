@@ -1,0 +1,11 @@
+{
+    'genome' : '/work/bio-chenx/reference/homo_sapiens/ucsc/hg38/hisat2_index/genome',
+    'hisat2_X' :  '2000',
+    'picard_jar' : '/work/bio-chenx/tools/picard-2.20.3/picard.jar',
+    'blacklist' : '/work/bio-chenx/reference/homo_sapiens/ucsc/hg38/hg38-blacklist.v2.bed',
+    'gsize' : 'hs',
+    'bpk' : '',
+    'chromsize' : '/work/bio-chenx/reference/homo_sapiens/ucsc/hg38/hg38.chrom.sizes',
+    'macs2_format' : 'BED',
+    'macs2_shift' : '--nomodel --shift -100 --extsize 200'
+}

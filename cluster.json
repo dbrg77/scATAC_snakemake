@@ -1,28 +1,10 @@
 {
     "__default__" :
     {
-        "nCPUs" : "1",
-        "memory" : 1000,
-        "resources" : "\"select[mem>1000] rusage[mem=1000] span[hosts=1]\"",
-        "name" : "JOBNAME.{rule}.{wildcards.run_accession}",
-        "output" : "logs/{rule}.{wildcards.run_accession}.bsub"
-    },
-
-        "bwt2" :
-    {
-        "nCPUs" : "4",
-        "memory" : 4000,
-        "resources" : "\"select[mem>4000] rusage[mem=4000] span[hosts=1]\"",
-        "name" : "JOBNAME.{rule}.{wildcards.run_accession}",
-        "output" : "logs/{rule}.{wildcards.run_accession}.bsub"
-    },
-
-        "picard" :
-    {
-        "nCPUs" : "1",
-        "memory" : 16000,
-        "resources" : "\"select[mem>16000] rusage[mem=16000] span[hosts=1]\"",
-        "name" : "JOBNAME.{rule}.{wildcards.run_accession}",
-        "output" : "logs/{rule}.{wildcards.run_accession}.bsub"
+        "nCPUs" : "12",
+        "memory" : 12000,
+        "resources" : "\"select[mem>12000] rusage[mem=12000] span[hosts=1]\"",
+        "output" : "bsub_logs/{rule}.bsub",
+        "queues" : "ser",
     },
 }
