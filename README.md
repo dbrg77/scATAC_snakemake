@@ -5,7 +5,7 @@ This repository contains codes for processing scATAC-seq data produced by the [p
 
 ### 1. Get all the required softwares/packages
 
-Install the following packages either using conda or pip or directly download the pre-compiled binary from the webste:
+Install the following packages either using conda or pip or directly download the pre-compiled binary from the website:
 
 ```
 python3
