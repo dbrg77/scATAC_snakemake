@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -e "cell\tuniq_frags" > qc_metrics/uniq_nuc_frags.txt
+echo -e "cell\tuniq_nuc_frags" > qc_metrics/uniq_nuc_frags.txt
 echo -e "cell\tmt_content" > qc_metrics/mt_content.txt
 
 for i in */picard_bam/*.bam; do
