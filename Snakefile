@@ -31,13 +31,16 @@ rule all:
         'aggregate/f2q30_merged_pmd_isize.hist',
         'aggregate/aggregated_scATAC_peaks.xls',
         'aggregate/aggregated_scATAC_peaks.narrowPeak',
+        'aggregate/aggregated_scATAC_peaks_formatted.bed',
         'aggregate/aggregated_scATAC_treat_pileup.bdg',
         'aggregate/aggregated_scATAC_control_lambda.bdg',
         'aggregate/aggregated_scATAC_treat_pileup.bw',
-        list(samples['rep'] + '/count/' + samples["cell"] + '.count'),
-        'count_matrix_over_aggregate.mtx',
-        'count_matrix_over_aggregate.rownames',
-        'count_matrix_over_aggregate.colnames',
+        list(samples['rep'] + '/count/' + samples['cell'] + '.count'),
+        'outs/count_matrix_over_aggregate.mtx',
+        'outs/count_matrix_over_aggregate.rows',
+        'outs/count_matrix_over_aggregate.cols',
+        'outs/aggregate_fragments.tsv.gz',
+        'outs/aggregate_fragments.tsv.gz.tbi',
         'qc_metrics/dup_level.txt',
         'qc_metrics/mapping_rate.txt',
         'qc_metrics/mt_content.txt',
@@ -45,7 +48,8 @@ rule all:
         'qc_metrics/uniq_nuc_frags.txt',
         'qc_metrics/frip.txt',
         'qc_metrics/frac_open.txt',
-        'qc_metrics/library_size.txt'
+        'qc_metrics/library_size.txt',
+        'outs/sample_info.csv'
 
 rule fastp:
     input:
@@ -59,7 +63,7 @@ rule fastp:
     log:
         out='logs/fastp/{rep}/{cell}.stdout',
         err='logs/fastp/{rep}/{cell}.stderr'
-    threads: 12
+    threads: 16
     shell:
         ''' fastp -l 25 -w {threads} --detect_adapter_for_pe \
             -i {input.r1} -I {input.r2} \
@@ -78,7 +82,7 @@ rule hisat2:
     params:
         idx=config['genome'],
         maxi=config['hisat2_X']
-    threads: 12
+    threads: 20
     shell:
         ''' hisat2 \
             -X {params.maxi} \
@@ -100,12 +104,12 @@ rule spicard:
         pmd=config['picard_jar']
     output:
         bam='{rep}/picard_bam/{cell}_f2q30_pmd.bam',
-        met='{rep}/picard_log/{cell}_f2q30_pmd.out',
+        met='{rep}/picard_log/{cell}_f2q30_pmd.out'
     log:
         out='logs/spicard/{rep}/{cell}.stdout',
         err='logs/spicard/{rep}/{cell}.stderr'
     shell:
-        ''' java -jar -Xmx4g {input.pmd} \
+        ''' java -Xmx4g -jar {input.pmd} \
             MarkDuplicates \
             INPUT={input.bam} \
             OUTPUT={output.bam} \
@@ -130,19 +134,19 @@ rule isize:
     output:
         '{rep}/isize_hist/{cell}_isize.hist'
     shell:
-        """ samtools view {input} | \
+        ''' samtools view {input} | \
             sed '/chrM/d' | \
             awk '{{ if($9>0){{print $9}} else {{print -1*$9}} }}' | \
             sort | uniq -c | \
             sort -b -k2,2n | \
             sed -e 's/^[ \t]*//' > {output}
-        """
+        '''
 
 rule list_bam:
     input:
         expand('{rep}/picard_bam/{cell}_f2q30_pmd.bam', zip,
-               rep=samples["rep"],
-               cell=samples["cell"])
+               rep=samples['rep'],
+               cell=samples['cell'])
     output:
         expand('{rep}/bam_file_list.txt', rep=replicate)
     shell:
@@ -182,7 +186,7 @@ rule mpicard:
         out='logs/mpicard/mpicard.stdout',
         err='logs/mpicard/mpicard.stderr'
     shell:
-        ''' java -jar -Xmx8g {input.pmd} \
+        ''' java -Xmx8g -jar {input.pmd} \
             MarkDuplicates \
             INPUT={input.bam} \
             OUTPUT={output.bam} \
@@ -198,13 +202,13 @@ rule isize_aggregate:
     output:
         'aggregate/f2q30_merged_pmd_isize.hist'
     shell:
-        """ samtools view {input} | \
+        ''' samtools view {input} | \
             sed '/chrM/d' | \
             awk '{{ if($9>0){{print $9}} else {{print -1*$9}} }}' | \
             sort | uniq -c | \
             sort -b -k2,2n | \
             sed -e 's/^[ \t]*//' > {output}
-        """
+        '''
 
 rule bam2bed:
     input:
@@ -239,7 +243,6 @@ rule macs2:
             {params.broad} \
             -f {params.fmt} \
             -q 0.01 \
-            --nomodel \
             {params.shift} \
             --keep-dup all \
             -B --SPMR \
@@ -258,9 +261,19 @@ rule bigwig:
         ''' bdg2bw {input}
         '''
 
+rule format_peak:
+    input:
+        'aggregate/aggregated_scATAC_peaks.narrowPeak'
+    output:
+        'aggregate/aggregated_scATAC_peaks_formatted.bed'
+    shell:
+        ''' awk 'BEGIN{{OFS="\t"}}{{print $1, $2, $3, $1 "-" $2 "-" $3}}' \
+            {input} > {output}
+        '''
+
 rule count:
     input:
-        peak='aggregate/aggregated_scATAC_peaks.narrowPeak',
+        peak='aggregate/aggregated_scATAC_peaks_formatted.bed',
         bam='{rep}/picard_bam/{cell}_f2q30_pmd.bam'
     output:
         '{rep}/count/{cell}.count'
@@ -268,28 +281,49 @@ rule count:
         ''' coverageBed \
             -a {input.peak} \
             -b {input.bam} | \
-            cut -f 4,11 > {output}
+            cut -f 4,5 > {output}
         '''
 
 rule countMatrix:
     input:
         expand('{rep}/count/{cell}.count', zip,
-               rep=samples["rep"], cell=samples["cell"])
+               rep=samples['rep'], cell=samples['cell']),
+        'aggregate/aggregated_scATAC_peaks_formatted.bed'
     output:
-        'count_matrix_over_aggregate.mtx',
-        'count_matrix_over_aggregate.rownames',
-        'count_matrix_over_aggregate.colnames'
+        'outs/count_matrix_over_aggregate.mtx',
+        'outs/count_matrix_over_aggregate.rows',
+        'outs/count_matrix_over_aggregate.cols'
     script:
-        'scripts/genernate_count_matrix.py'
+        'scripts/generate_count_csc_mtx.py'
+
+rule getFragments:
+    input:
+        expand('{rep}/picard_bam/{cell}_f2q30_pmd.bam', zip,
+               rep=samples['rep'], cell=samples['cell'])
+    output:
+        'outs/aggregate_fragments.tsv.gz'
+    shell:
+        ''' bash scripts/generate_fragments_file.sh | \
+            sort -k1,1 -k2,2n | bgzip > {output}
+        '''
+
+rule indexFrag:
+    input:
+        'outs/aggregate_fragments.tsv.gz'
+    output:
+        'outs/aggregate_fragments.tsv.gz.tbi'
+    shell:
+        ''' tabix -p bed {input}
+        '''
 
 rule basicQc:
     input:
         expand('{rep}/picard_bam/{cell}_f2q30_pmd.bam', zip,
-               rep=samples["rep"], cell=samples["cell"]),
+               rep=samples['rep'], cell=samples['cell']),
         expand('{rep}/picard_bam/{cell}_f2q30_pmd.bam.bai', zip,
-               rep=samples["rep"], cell=samples["cell"]),
+               rep=samples['rep'], cell=samples['cell']),
         expand('{rep}/hisat2_log/{cell}_aln_sum.txt', zip,
-               rep=samples["rep"], cell=samples["cell"])
+               rep=samples['rep'], cell=samples['cell'])
     output:
         'qc_metrics/dup_level.txt',
         'qc_metrics/mapping_rate.txt',
@@ -307,9 +341,9 @@ rule basicQc:
 rule frip:
     input:
         expand('{rep}/picard_bam/{cell}_f2q30_pmd.bam', zip,
-               rep=samples["rep"], cell=samples["cell"]),
+               rep=samples['rep'], cell=samples['cell']),
         expand('{rep}/picard_bam/{cell}_f2q30_pmd.bam.bai', zip,
-               rep=samples["rep"], cell=samples["cell"]),
+               rep=samples['rep'], cell=samples['cell']),
         'aggregate/aggregated_scATAC_peaks.narrowPeak'
     output:
         'qc_metrics/frip.txt'
@@ -320,10 +354,25 @@ rule frip:
 rule fracOpen:
     input:
         expand('{rep}/picard_bam/{cell}_f2q30_pmd.bam', zip,
-               rep=samples["rep"], cell=samples["cell"]),
+               rep=samples['rep'], cell=samples['cell']),
         'aggregate/aggregated_scATAC_peaks.narrowPeak'
     output:
         'qc_metrics/frac_open.txt'
     shell:
         ''' scripts/get_frac_open.sh
         '''
+
+rule sampleInfo:
+    input:
+        'qc_metrics/dup_level.txt',
+        'qc_metrics/mapping_rate.txt',
+        'qc_metrics/mt_content.txt',
+        'qc_metrics/sequencing_depth.txt',
+        'qc_metrics/uniq_nuc_frags.txt',
+        'qc_metrics/library_size.txt',
+        'qc_metrics/frip.txt',
+        'qc_metrics/frac_open.txt'
+    output:
+        'outs/sample_info.csv'
+    script:
+        'scripts/collect_metadata.py'
