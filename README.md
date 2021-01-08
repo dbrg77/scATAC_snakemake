@@ -18,6 +18,7 @@ samtools v1.9
 bedtools v2.27.1
 fastp v0.20.1
 macs2 v2.2.7.1
+tabix 0.2.5
 ```
 
 Get the picard tool `picard.jar` from https://github.com/broadinstitute/picard/releases
