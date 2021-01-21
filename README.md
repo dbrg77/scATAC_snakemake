@@ -84,7 +84,9 @@ Experiment
 .   .   .
 ├── scripts
 │   │
-│   ├── genernate_count_matrix.py
+│   ├── collect_metadata.py
+│   ├── generate_count_csc_mtx.py
+│   ├── generate_fragments_file.sh
 │   ├── get_depth_mr.sh
 │   ├── get_dup_level.sh
 │   ├── get_frac_open.sh
