@@ -23,27 +23,27 @@ tabix 0.2.5
 
 Get the picard tool `picard.jar` from https://github.com/broadinstitute/picard/releases
 
-Get `calc`, `addCols`, `bedClip`, `bedGraphToBigWig` and `fetchChromSizes` from [UCSC utilities](http://hgdownload.soe.ucsc.edu/admin/exe/), and make sure they are executable and in your `PATH`.
+Get `calc`, `addCols`, `bedClip`, `bedGraphToBigWig` and `fetchChromSizes` from [UCSC utilities](http://hgdownload.soe.ucsc.edu/admin/exe/), and make sure they are executable and in your `$PATH`.
 
 Get [bdg2bw](https://gist.github.com/taoliu/2469050) to convert the macs2 generated begraph to bigwig for visualisation.
 
 ### 2. Change the content insde `config.json`
 
-There are a few things you need to change in the `config.json` according to your computing environment:
+There are a few things you need to change in the `config.json` file according to your computing environment:
 
 __genome__: This is the prefix of `hisat2` index for the genome you are working on. It is basically passed to the `-x` flag of `hisat2` during alignment.
 
-__hisat2_X__: This is the `-X` of `hisat2`, which suggest the maximum frament in bp allowed during the alignment. People normally use `2000` for ATAC-seq.
+__hisat2_X__: This is the `-X` flag of `hisat2`, which suggests the maximum frament in bp allowed during the alignment. People normally use `2000` for ATAC-seq.
 
-__picard_jar__: The location pointing to the `picard.jar` file is.
+__picard_jar__: The location of the `picard.jar` file.
 
 __blacklist__: The ENCODE blacklist region to exclude for analysis. Check [this publication](https://www.nature.com/articles/s41598-019-45839-z) for more details. There are a few pre-compiled blacklists for different genome builds that can be found [here](https://github.com/Boyle-Lab/Blacklist).
 
-__gsize__: This is the `-g` genome size option for `macs2` during peak calling.
+__gsize__: This is the genome size `-g` option for `macs2` during the peak calling.
 
 __bpk__: This contains the `macs2` flags for broadPeak calling. In most cases, ATAC-seq signals are sharp, we normally leave this empty here.
 
-__chromsize__: The location pointing to the tab-delimited file that contains the length of each chromosome. Use the UCSC `fetchChromSizes` to get this file. For example, to get the file for hg38, simply run `fetchChromSizes hg38 > hg38.chrom.sizes`.
+__chromsize__: The location pointing to the tab-delimited file that contains the length of each chromosome. Use the UCSC `fetchChromSizes` program to get this file. For example, to get the file for hg38, simply run `fetchChromSizes hg38 > hg38.chrom.sizes`.
 
 __macs2_format__: This is the file format duing `macs2` peak calling. We use `BED` in this pipeline.
 
@@ -105,9 +105,94 @@ To use all available cores to run the pipeline, simply type `snakemake --cores` 
 
 You can also run the pipeline using `bsub`, using the command and setting provided in the `submit_snake.sh` and `cluster.json` files. These two files can be ignored if you are not using `bsub`.
 
-## What are the differences?
+### Understanding the output files
 
-There are not many differences comparing to the [original analysis method](https://github.com/dbrg77/plate_scATAC-seq) used in the original publication. In the original repository, the data processing is hard coded for a specific species. Here we have added `config.json` file to make the processing more flexible and easier to modify.
+There will be quite a few useful intermediate files generated during the process of the pipeline. They are organised into each directory, and the name of the file is sel-explanatory. The most important out files are in the `outs` directory. If the the pipeline runs successfully, you should expect an `outs` directory under the `Experiment` directory. Inside the `outs` directory, there will be six files:
+
+__aggregate_fragments.tsv.gz__: this is a tab-delimited file that contains the ATAC fragments of all cells after deduplication, with the following specification:
+
+| column     | meaning                                     |
+|------------|---------------------------------------------|
+| 1st column | chromosome of the fragment                  |
+| 2nd column | 0-based start coordinate of the fragment    |
+| 3rd column | 1-based end corrdinate of the fragment      |
+| 4th column | the cell name from where the fragment comes |
+| 5th column | just '1'                                    |
+
+__aggregate_fragments.tsv.gz.tbi__: the index of the fragment file, created by the `indexFrag` rule from the `Snakefile`.
+
+__count_matrix_over_aggregate.mtx__: the peak-by-cell count matrix in matrix market format. This is basically `sparse.csc_matrix` if you use `python`; or this can be treated as `dgCMatrix` if you use `R`.
+
+__count_matrix_over_aggregate.cols__: the name of each cell in plain text format.
+
+__count_matrix_over_aggregate.rows__: the peak location in a 3-column `bed` format.
+
+__sample_info.csv__: a csv file containing the basica quality metrics of each cell. The meaning of each column is described as follows:
+
+| column           | value                                                                        | typical range for a successful cell |
+|------------------|------------------------------------------------------------------------------|-------------------------------------|
+| cell             | the name of the cell                                                         | N/A                                 |
+| frac_open        | percentage (%) of all peaks detected (at least one read) in the cell         | 1-20                                |
+| mapping_rate     | overall alignment rate (%) from hisat2                                       | 70 - 90                             |
+| mt_content       | percentage (%) of reads mapped to the reference genome                       | 0.1 - 90                            |
+| uniq_nuc_frags   | number of read mapped to the nuclear genome after deduplication              | 10,000 - 100,000                    |
+| dup_level        | duplication level (%) estimated by the picard tool                           | 40 - 90                             |
+| frip             | fraction of reads that come from the peak region                             | 20 - 80                             |
+| sequencing_depth | total number of reads sequenced per cell                                     | 10,000 - 1,000,000                  |
+| library_size     | library complexity (number of unique fragments) estimated by the picard tool | 10,000 - 100,000                    |
+
+### 5. Load the output files into [Signac](https://satijalab.org/signac/)
+
+If you use `python`, `mmread` from `scipy` is your friend. If you use `R`, you have many choices. To load data into `Signac`, use the following lines of code:
+
+```R
+library(Signac)
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+library(hdf5r)
+library(dplyr)
+library(readr)
+
+# read the content from the 'outs' directory
+setwd("/your/working/directory")
+mex_dir_path <- "/path/to/mtx"
+
+mtx_path <- paste(mex_dir_path, "count_matrix_over_aggregate.mtx", sep = '/')
+feature_path <- paste(mex_dir_path, "count_matrix_over_aggregate.rows", sep = '/')
+barcode_path <- paste(mex_dir_path, "count_matrix_over_aggregate.cols", sep = '/')
+
+features <- readr::read_tsv(feature_path, col_names = F) %>% tidyr::unite(feature)
+barcodes <- readr::read_tsv(barcode_path, col_names = F) %>% tidyr::unite(barcode)
+metadata <- read.csv(
+  file = "/path/to/outs/sample_info.csv",
+  header = TRUE,
+  row.names = 1
+)
+
+# create a Signac chromatin assay and a Seurat object
+mtx <- Matrix::readMM(mtx_path) %>%
+  magrittr::set_rownames(features$feature) %>%
+  magrittr::set_colnames(barcodes$barcode)
+chrom_assay <- CreateChromatinAssay(
+  counts = mtx,
+  sep = c("_", "_"),
+  genome = 'hg38',
+  min.cells = 10,
+  min.features = 200
+)
+
+atac <- CreateSeuratObject(
+  counts = chrom_assay,
+  assay = 'peaks',
+  project = 'scATAC-seq_is_cool',
+  meta.data = metadata
+)
+```
+
+## What are the differences comparing to the original Nat. Comms. publication?
+
+There are not many differences. Here we have added `config.json` file to make the processing more flexible and easier to modify, and changed the output format so that the output files can be read by downstream scATAC-seq analysis softwares.
 
 # Contact
 Xi Chen  
