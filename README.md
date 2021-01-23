@@ -58,6 +58,10 @@ Experiment
 │
 ├── config.json
 │
+├── cluster.json
+│
+├── submit_snake.sh
+│
 ├── plate1
 │   │
 │   ├── fastq
