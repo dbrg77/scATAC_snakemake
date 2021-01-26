@@ -133,8 +133,8 @@ __count_matrix_over_aggregate.rows__: the peak location in a 3-column `bed` form
 
 __sample_info.csv__: a csv file containing the basic quality metrics of each cell. The meaning of each column is described as follows:
 
-|      column      |                                            value                                           | typical range for a successful cell |
-|:----------------:|:------------------------------------------------------------------------------------------:|:-----------------------------------:|
+| column           | value                                                                                      | typical range for a successful cell |
+|------------------|--------------------------------------------------------------------------------------------|-------------------------------------|
 | cell             | the name of the cell                                                                       | N/A                                 |
 | frac_open        | percentage (%) of all peaks detected (at least one read) in the cell                       | 1 - 20                              |
 | mapping_rate     | overall alignment rate (%) from hisat2                                                     | 70 - 99                             |
