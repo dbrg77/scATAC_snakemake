@@ -131,19 +131,19 @@ __count_matrix_over_aggregate.cols__: the name of each cell in plain text format
 
 __count_matrix_over_aggregate.rows__: the peak location in a 3-column `bed` format.
 
-__sample_info.csv__: a csv file containing the basica quality metrics of each cell. The meaning of each column is described as follows:
+__sample_info.csv__: a csv file containing the basic quality metrics of each cell. The meaning of each column is described as follows:
 
-| column           | value                                                                        | typical range for a successful cell |
-|------------------|------------------------------------------------------------------------------|-------------------------------------|
-| cell             | the name of the cell                                                         | N/A                                 |
-| frac_open        | percentage (%) of all peaks detected (at least one read) in the cell         | 1-20                                |
-| mapping_rate     | overall alignment rate (%) from hisat2                                       | 70 - 90                             |
-| mt_content       | percentage (%) of reads mapped to the reference genome                       | 0.1 - 90                            |
-| uniq_nuc_frags   | number of read mapped to the nuclear genome after deduplication              | 10,000 - 100,000                    |
-| dup_level        | duplication level (%) estimated by the picard tool                           | 40 - 90                             |
-| frip             | fraction of reads that come from the peak region                             | 20 - 80                             |
-| sequencing_depth | total number of reads sequenced per cell                                     | 10,000 - 1,000,000                  |
-| library_size     | library complexity (number of unique fragments) estimated by the picard tool | 10,000 - 100,000                    |
+|      column      |                                            value                                           | typical range for a successful cell |
+|:----------------:|:------------------------------------------------------------------------------------------:|:-----------------------------------:|
+| cell             | the name of the cell                                                                       | N/A                                 |
+| frac_open        | percentage (%) of all peaks detected (at least one read) in the cell                       | 1 - 20                              |
+| mapping_rate     | overall alignment rate (%) from hisat2                                                     | 70 - 99                             |
+| mt_content       | percentage (%) of reads mapped to the reference genome                                     | 0.1 - 90                            |
+| uniq_nuc_frags   | number of read mapped to the nuclear genome after deduplication                            | 10,000 - 100,000                    |
+| dup_level        | duplication level estimated by the picard tool, indicating the fraction of duplicate reads | 0.4 - 0.9                           |
+| frip             | percentage of reads that come from the peak region                                         | 20 - 80                             |
+| sequencing_depth | total number of reads sequenced per cell                                                   | 10,000 - 1,000,000                  |
+| library_size     | library complexity (number of unique fragments) estimated by the picard tool               | 10,000 - 1000,000                   |
 
 ### 5. Load the output files into [Signac](https://satijalab.org/signac/)
 
