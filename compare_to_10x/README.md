@@ -35,13 +35,19 @@ Creat an `index.txt` file which contains the "true cell barcodes" using the info
 
 ```
 echo -e "#index1\tName" > index.txt
-awk -F, '$10==1' atac_pbmc_500_v1_singlecell.csv | cut -f 1 -d, | cut -f 1 -d '-' | awk 'BEGIN{OFS="\t"}{print $1, "cell_" NR}' >> index.txt
+awk -F, '$10==1' atac_pbmc_500_v1_singlecell.csv | \
+    cut -f 1 -d, | cut -f 1 -d '-' | \
+    awk 'BEGIN{OFS="\t"}{print $1, "cell_" NR}' >> index.txt
 ```
 
 Demultiplex the fastq files into individual true cells using [deML](https://github.com/grenaud/deml):
 
 ```
-deML -i index.txt -f atac_pbmc_500_v1_S1_L001_R1_001.fastq.gz -r atac_pbmc_500_v1_S1_L001_R3_001.fastq.gz -if1 atac_pbmc_500_v1_S1_L001_R2_001.fastq.gz --mm 1 -o pbmc_v1
+deML -i index.txt \
+     -f atac_pbmc_500_v1_S1_L001_R1_001.fastq.gz \
+     -r atac_pbmc_500_v1_S1_L001_R3_001.fastq.gz \
+     -if1 atac_pbmc_500_v1_S1_L001_R2_001.fastq.gz \
+     --mm 1 -o pbmc_v1
 ```
 
 After the above step, remove all 'failed' and 'unknown' files. You will get two fastq files per cell: `{cell}_r1.fq.gz` and `{cell}_r2.fq.gz`. These can be used as the starting point for the snakemake pipeline.

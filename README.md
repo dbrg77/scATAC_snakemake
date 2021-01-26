@@ -147,7 +147,7 @@ __sample_info.csv__: a csv file containing the basica quality metrics of each ce
 
 ### 5. Load the output files into [Signac](https://satijalab.org/signac/)
 
-If you use `python`, `mmread` from `scipy` is your friend. If you use `R`, you have many choices. To load data into `Signac`, use the following lines of code:
+If you use `python`, use `mmread` from `scipy` can load the `mtx` file and conduct analysis using differen packages from `scikit-learn`. You can also try [EpiScanpy](https://episcanpy.readthedocs.io/en/latest/index.html). If you use `R`, you have many choices for analysis. To load data into `Signac`, use the following lines of code:
 
 ```R
 library(Signac)
