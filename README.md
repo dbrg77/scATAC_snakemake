@@ -143,7 +143,7 @@ __sample_info.csv__: a csv file containing the basic quality metrics of each cel
 | dup_level        | duplication level estimated by the picard tool, indicating the fraction of duplicate reads | 0.4 - 0.9                           |
 | frip             | percentage of reads that come from the peak region                                         | 20 - 80                             |
 | sequencing_depth | total number of reads sequenced per cell                                                   | 10,000 - 1,000,000                  |
-| library_size     | library complexity (number of unique fragments) estimated by the picard tool               | 10,000 - 1000,000                   |
+| library_size     | library complexity (number of unique fragments) estimated by the picard tool               | 10,000 - 1,000,000                  |
 
 ### 5. Load the output files into [Signac](https://satijalab.org/signac/)
 
