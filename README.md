@@ -51,7 +51,7 @@ __macs2_shift__: The flags used for calling narrowPeak. Use `--nomodel --shift -
 
 ### 3. Organise your files
 
-The starting point of the pipeline is the `fastq` files. Put your `fastq` files inside each plate directory. Also put the `Snakefile`, `config.json` and the `scripts` folder from this repositor to your experiment directory. The structure will be like this:
+The starting point of the pipeline is the `fastq` files. Put your `fastq` files inside each plate directory. Also put the `Snakefile`, `config.json` and the `scripts` folder from this repository to your experiment directory. The structure will be like this:
 
 ```
 Experiment
