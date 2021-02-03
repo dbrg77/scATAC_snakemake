@@ -111,7 +111,7 @@ You can also run the pipeline using `bsub`, using the command and setting provid
 
 ### Understanding the output files
 
-There will be quite a few useful intermediate files generated during the process of the pipeline. They are organised into each directory, and the name of the file is sel-explanatory. The most important out files are in the `outs` directory. If the the pipeline runs successfully, you should expect an `outs` directory under the `Experiment` directory. Inside the `outs` directory, there will be six files:
+There will be quite a few useful intermediate files generated during the process of the pipeline. They are organised into each directory, and the name of the file is self-explanatory. The most important output files are in the `outs` directory. If the the pipeline runs successfully, you should expect an `outs` directory under the `Experiment` directory. Inside the `outs` directory, there will be six files:
 
 __aggregate_fragments.tsv.gz__: this is a tab-delimited file that contains the ATAC fragments of all cells after deduplication, with the following specification:
 
@@ -125,7 +125,7 @@ __aggregate_fragments.tsv.gz__: this is a tab-delimited file that contains the A
 
 __aggregate_fragments.tsv.gz.tbi__: the index of the fragment file, created by the `indexFrag` rule from the `Snakefile`.
 
-__count_matrix_over_aggregate.mtx__: the peak-by-cell count matrix in matrix market format. This is basically `sparse.csc_matrix` if you use `python`; or this can be treated as `dgCMatrix` if you use `R`.
+__count_matrix_over_aggregate.mtx__: the peak-by-cell count matrix in `matrix market format`. This is basically `sparse.csc_matrix` if you use `python`; or this can be treated as `dgCMatrix` if you use `R`.
 
 __count_matrix_over_aggregate.cols__: the name of each cell in plain text format.
 
@@ -141,13 +141,13 @@ __sample_info.csv__: a csv file containing the basic quality metrics of each cel
 | mt_content       | percentage (%) of reads mapped to the reference genome                                     | 0.1 - 90                            |
 | uniq_nuc_frags   | number of read mapped to the nuclear genome after deduplication                            | 10,000 - 100,000                    |
 | dup_level        | duplication level estimated by the picard tool, indicating the fraction of duplicate reads | 0.4 - 0.9                           |
-| frip             | percentage of reads that come from the peak region                                         | 20 - 80                             |
+| frip             | percentage (%) of reads that come from the peak region                                     | 20 - 80                             |
 | sequencing_depth | total number of reads sequenced per cell                                                   | 10,000 - 1,000,000                  |
 | library_size     | library complexity (number of unique fragments) estimated by the picard tool               | 10,000 - 1,000,000                  |
 
 ### 5. Load the output files into [Signac](https://satijalab.org/signac/)
 
-If you use `python`, use `mmread` from `scipy` can load the `mtx` file and conduct analysis using differen packages from `scikit-learn`. You can also try [EpiScanpy](https://episcanpy.readthedocs.io/en/latest/index.html). If you use `R`, you have many choices for analysis. To load data into `Signac`, use the following lines of code:
+If you use `python`, use `mmread` from `scipy` to load the `mtx` file and conduct analysis using differen packages from `scikit-learn`. You can also try [EpiScanpy](https://episcanpy.readthedocs.io/en/latest/index.html). If you use `R`, you have many choices for the analysis. To load data into `Signac`, use the following lines of code:
 
 ```R
 library(Signac)
