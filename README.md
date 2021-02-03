@@ -66,24 +66,24 @@ Experiment
 │   │
 │   ├── fastq
 │   │   │
-│   │   ├── scATAC_cell_001_r1.fq.gz
-│   │   ├── scATAC_cell_001_r2.fq.gz
-│   │   ├── scATAC_cell_002_r1.fq.gz
-│   │   ├── scATAC_cell_002_r2.fq.gz
-│   │   ├── scATAC_cell_003_r1.fq.gz
-│   │   ├── scATAC_cell_003_r2.fq.gz
+│   │   ├── scATAC_p1_cell_001_r1.fq.gz
+│   │   ├── scATAC_p1_cell_001_r2.fq.gz
+│   │   ├── scATAC_p1_cell_002_r1.fq.gz
+│   │   ├── scATAC_p1_cell_002_r2.fq.gz
+│   │   ├── scATAC_p1_cell_003_r1.fq.gz
+│   │   ├── scATAC_p1_cell_003_r2.fq.gz
 .   .   .
 .   .   .
 ├── plate2
 │   │
 │   ├── fastq
 │   │   │
-│   │   ├── scATAC_cell_001_r1.fq.gz
-│   │   ├── scATAC_cell_001_r2.fq.gz
-│   │   ├── scATAC_cell_002_r1.fq.gz
-│   │   ├── scATAC_cell_002_r2.fq.gz
-│   │   ├── scATAC_cell_003_r1.fq.gz
-│   │   ├── scATAC_cell_003_r2.fq.gz
+│   │   ├── scATAC_p2_cell_001_r1.fq.gz
+│   │   ├── scATAC_p2_cell_001_r2.fq.gz
+│   │   ├── scATAC_p2_cell_002_r1.fq.gz
+│   │   ├── scATAC_p2_cell_002_r2.fq.gz
+│   │   ├── scATAC_p2_cell_003_r1.fq.gz
+│   │   ├── scATAC_p2_cell_003_r2.fq.gz
 .   .   .
 .   .   .
 ├── scripts
