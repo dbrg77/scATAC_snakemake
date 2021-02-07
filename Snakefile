@@ -85,17 +85,12 @@ rule hisat2:
     threads: 20
     shell:
         ''' hisat2 \
-            -X {params.maxi} \
-            -p {threads} \
-            --no-temp-splicesite \
-            --no-spliced-alignment \
-            -x {params.idx} \
-            -1 {input.r1} \
-            -2 {input.r2} \
-            -3 1 \
+            -x {params.idx} -X {params.maxi} -p {threads} \
+            --no-temp-splicesite --no-spliced-alignment \
+            -1 {input.r1} -2 {input.r2} -3 1 \
             --summary-file {output.stats} | \
-            samtools view -ShuF 4 -f 2 -q 30 - | \
-            samtools sort - -T {wildcards.cell}_tmp -o {output.bam}
+            samtools view -ShuF 4 -f 2 -q 30 -@ {threads} - | \
+            samtools sort - -@ {threads} -T {wildcards.cell}_tmp -o {output.bam}
         '''
 
 rule spicard:
