@@ -1,6 +1,14 @@
 # A Snakemake pipeline to process plate-based scATAC-seq data
 This repository contains codes for processing scATAC-seq data produced by the [plate-based scATAC-seq method](https://www.nature.com/articles/s41467-018-07771-0).
 
+## What are the differences comparing to the original Nat. Comms. publication?
+
+In this pipeline, we have:
+
+1. Added `config.json` file to make the processing more flexible and easier to modify.
+2. Used the `BED` file for the MACS2 peak calling. See [this tweet](https://twitter.com/XiChenUoM/status/1336658454866325506) for the reason.
+3. Produced `10x Genomics` like output files in the final `outs` directory so that they can be easily put into downwstream analysis package like [Signac](https://satijalab.org/signac/). See below for more details.
+
 ## How to use?
 
 ### 1. Get all the required softwares/packages
@@ -193,10 +201,6 @@ atac <- CreateSeuratObject(
   meta.data = metadata
 )
 ```
-
-## What are the differences comparing to the original Nat. Comms. publication?
-
-There are not many differences. Here we have added `config.json` file to make the processing more flexible and easier to modify, and changed the output format so that the output files can be read by downstream scATAC-seq analysis softwares.
 
 # Contact
 Xi Chen  
