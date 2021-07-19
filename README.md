@@ -1,5 +1,5 @@
 # A Snakemake pipeline to process plate-based scATAC-seq data
-This repository contains codes for processing scATAC-seq data produced by the plate-based scATAC-seq method. The method was originally published in [Nature Communications 2018](https://www.nature.com/articles/s41467-018-07771-0). A more detailed step-by-step protocol was published in [Nature Protocols](https://www.nature.com/articles/s41596-021-00583-5).
+This repository contains codes for processing scATAC-seq data produced by the plate-based scATAC-seq method. The method was originally published in [Nature Communications 2018](https://www.nature.com/articles/s41467-018-07771-0). A more detailed step-by-step protocol was published in [Nature Protocols 2021](https://www.nature.com/articles/s41596-021-00583-5).
 
 ## What are the differences comparing to the original Nat. Comms. publication?
 
