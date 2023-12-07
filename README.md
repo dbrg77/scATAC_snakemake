@@ -129,7 +129,7 @@ __aggregate_fragments.tsv.gz__: this is a tab-delimited file that contains the A
 | 2nd column | 0-based start coordinate of the fragment    |
 | 3rd column | 1-based end corrdinate of the fragment      |
 | 4th column | the cell name from where the fragment comes |
-| 5th column | just '1'                                    |
+| 5th column | just '1' (might change)                     |
 
 __aggregate_fragments.tsv.gz.tbi__: the index of the fragment file, created by the `indexFrag` rule from the `Snakefile`.
 
